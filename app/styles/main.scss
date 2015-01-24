@@ -1,0 +1,40 @@
+// -------------------------------------
+//   Core settings
+// -------------------------------------
+
+@import "core/settings";
+
+// -------------------------------------
+//   Bootstrap
+// -------------------------------------
+
+$icon-font-path: "../bower_components/bootstrap-sass-official/assets/fonts/bootstrap/";
+@import "bootstrap-sass-official/assets/stylesheets/_bootstrap";
+
+// -------------------------------------
+//   Font awesome
+// -------------------------------------
+
+$fa-font-path: "/assets/font-awesome/fonts";
+@import "font-awesome/scss/font-awesome";
+//@import "core/_fa-override"; // Override @font-face definition
+
+// -------------------------------------
+//  Owl carousel
+// -------------------------------------
+
+@import  'owlcarousel/owl-carousel/owl.carousel.css';
+@import  'owlcarousel/owl-carousel/owl.theme.css';
+
+// -------------------------------------
+//  Core content and layouts
+// -------------------------------------
+
+@import "core/content";
+@import "core/layout";
+
+// -------------------------------------
+//  Modules
+// -------------------------------------
+
+@import "modules/index";
