@@ -10,3 +10,14 @@
  */
 angular
   .module('sydneyApp', []);
+
+
+
+$('.navigation').affix({
+  offset: {
+    top: function () {
+      return $(window).innerHeight() - 130
+    }
+  }
+})
+
