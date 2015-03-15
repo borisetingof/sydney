@@ -21,7 +21,6 @@
 
     <div class="video-container">
       <video src="http://techslides.com/demos/sample-videos/small.mp4" type=video/mp4" autoplay="true" loop="true" muted="true"></video>
-      <div class="avatar"></div>
     </div>
 
     <nav class="navbar navbar-default navigation">
@@ -53,7 +52,7 @@
 
 
   </section>
-  <section class="other-section">
+  <section class="other-section" id="googleMap">
     <div class="container">
       <h1>Elena Gratcheva</h1>
       <p class="lead">The bedding was hardly able to cover it and seemed ready to slide off any moment. His many legs, pitifully thin compared with the size of the rest of him, waved about helplessly as he looked.</p>
@@ -61,9 +60,12 @@
     </div>
   </section>
 
-  <section class="other-section">
-    <p>Third Screen</p>
+  <section class="other-section" id="webgl-container">
+    <canvas id="myCanvas"></canvas>
   </section>
+
+
+
 
 
 
@@ -98,6 +100,7 @@
 <script src="bower_components/jquery/dist/jquery.js"></script>
 <script src="bower_components/angular/angular.js"></script>
 <script src="bower_components/bootstrap-sass-official/assets/javascripts/bootstrap.js"></script>
+<script src="bower_components/threejs/build/three.min.js"></script>
 <!-- endbower -->
 <!-- endbuild -->
 
@@ -105,5 +108,189 @@
 <script src="scripts/app.js"></script>
 <script src="scripts/controllers/main.js"></script>
 <!-- endbuild -->
+<script src="http://maps.googleapis.com/maps/api/js"></script>
+<script>
+  function initialize() {
+    var mapOptions = {
+      center:new google.maps.LatLng(-33.8586749,151.207181),
+      disableDefaultUI: true,
+      draggable: false,
+      scrollwheel: false,
+      zoom:15,
+      mapTypeId:google.maps.MapTypeId.SATELLITE
+    };
+    var map = new google.maps.Map(document.getElementById("googleMap"), mapOptions);
+  }
+  google.maps.event.addDomListener(window, 'load', initialize);
+</script>
+
+
+
+  <!-- google maps in canvas -->
+
+  <script>
+    jQuery(window).ready(function(){
+      //g_initialize();
+    });
+
+    function g_initialize() {
+      var width = 640
+      var height = 640
+      var dimensions = width + "x" + height
+      $("#myCanvas").attr("width", width)
+      $("#myCanvas").attr("height", height)
+
+      var google_tile = "http://maps.google.com/maps/api/staticmap?sensor=false&center=-33.8586749,151.207181&zoom=15&size=" + dimensions + "&style=feature:all|element:labels|visibility:off"
+
+      var canvas = document.getElementById("myCanvas");
+      var context = canvas.getContext("2d");
+      var imageObj = new Image();
+      imageObj.src = google_tile;
+
+      imageObj.onload = function(){
+        context.drawImage(imageObj, 0, 0);
+        context.scale(1, 1)
+      }
+    }
+  </script>
+
+
+<!-- threejs bootstrap -->
+  <script id="vertexShader" type="x-shader/x-vertex">
+      varying vec2 vUv;
+
+			void main()	{
+        vUv = uv;
+				gl_Position = vec4( position, 1.0 );
+
+			}
+
+		</script>
+
+  <script id="fragmentShader" type="x-shader/x-fragment">
+        uniform sampler2D texture;
+        varying vec2 vUv;
+
+        float rand(vec2 co) {
+            return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
+        }
+        void main() {
+            vec4 color = texture2D(texture, vUv);
+
+            float diff = (rand(vUv) - 0.5);
+            color.r += diff;
+            color.g += diff;
+            color.b += diff;
+
+            gl_FragColor = color;
+        }
+		</script>
+
+  <script>
+
+
+    var container;
+
+    var camera, scene, renderer;
+
+    var uniforms;
+
+    init();
+    animate();
+
+    function init() {
+
+      container = document.getElementById( 'webgl-container' );
+
+      camera = new THREE.Camera();
+      camera.position.z = 1;
+
+      scene = new THREE.Scene();
+
+      var geometry = new THREE.PlaneBufferGeometry( 2, 2 )
+
+
+      var map_url = "http://maps.google.com/maps/api/staticmap?sensor=false&center=-33.8586749,151.207181&zoom=15&size=640x640&style=feature:all|element:labels|visibility:off"
+      THREE.ImageUtils.crossOrigin = "anonymous"
+
+
+
+      uniforms = {
+        texture: { type: "t", value: THREE.ImageUtils.loadTexture(map_url)}
+      };
+
+      var material = new THREE.ShaderMaterial( {
+        uniforms: uniforms,
+        vertexShader: document.getElementById( 'vertexShader' ).textContent,
+        fragmentShader: document.getElementById( 'fragmentShader' ).textContent
+      } );
+
+      var mesh = new THREE.Mesh( geometry, material );
+      scene.add( mesh );
+
+      renderer = new THREE.WebGLRenderer();
+      renderer.setPixelRatio( window.devicePixelRatio );
+      container.appendChild( renderer.domElement );
+
+
+      onWindowResize();
+
+      window.addEventListener( 'resize', onWindowResize, false );
+
+    }
+
+    function onWindowResize( event ) {
+
+      renderer.setSize( window.innerWidth, window.innerHeight );
+
+
+    }
+
+    //
+
+    function animate() {
+      requestAnimationFrame( animate );
+      render();
+    }
+
+    function render() {
+      renderer.render( scene, camera );
+    }
+
+  </script>
+
+
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
