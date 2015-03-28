@@ -169,6 +169,8 @@
 
   <script id="fragmentShader" type="x-shader/x-fragment">
         uniform sampler2D texture;
+        uniform float time;
+
         varying vec2 vUv;
 
         float rand(vec2 co) {
@@ -177,10 +179,28 @@
         void main() {
             vec4 color = texture2D(texture, vUv);
 
-            float diff = (rand(vUv) - 0.5);
-            color.r += diff;
-            color.g += diff;
-            color.b += diff;
+            if(color.r > 0.865 && color.g > 0.865 && color.b > 0.865) {
+              float diff = 180.0*rand(vUv) + time;
+
+              if(diff-time < 90.0){
+              color.r = tan(diff);
+              color.g = tan(diff);
+              color.b = tan(diff);
+              }
+              else{
+              color.r = 0.0;
+              color.g = 0.0;
+              color.b = 0.0;
+            }
+
+
+            }
+            else{
+              color.r = 0.0;
+              color.g = 0.0;
+              color.b = 0.0;
+            }
+
 
             gl_FragColor = color;
         }
@@ -216,7 +236,8 @@
 
 
       uniforms = {
-        texture: { type: "t", value: THREE.ImageUtils.loadTexture(map_url)}
+        texture: { type: "t", value: THREE.ImageUtils.loadTexture(map_url)},
+        time: { type: "f", value: 1.0 }
       };
 
       var material = new THREE.ShaderMaterial( {
@@ -241,7 +262,8 @@
 
     function onWindowResize( event ) {
 
-      renderer.setSize( window.innerWidth, window.innerHeight );
+      //renderer.setSize( window.innerWidth, window.innerHeight );
+      renderer.setSize( 640, 640 );
 
 
     }
@@ -254,6 +276,7 @@
     }
 
     function render() {
+      uniforms.time.value += 0.05;
       renderer.render( scene, camera );
     }
 
